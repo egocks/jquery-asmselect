@@ -61,3 +61,10 @@
 	top: 0;
 	padding: 5px; 
 }
+
+.asmMaximumSelect {
+	background: #fe7d7b;
+	color: #fff;
+	padding: 0.25em 0.5em 0.1em 0.5em;
+	margin: 1em 0 0 1em;
+}

@@ -22,7 +22,9 @@
 			addItemTarget: 'bottom',				// Where to place new selected items in list: top or bottom
 			hideWhenAdded: false,					// Hide the option when added to the list? works only in FF
 			debugMode: false,					// Debug mode keeps original select visible 
-      beforeItemAdded: function(item){}, // callback before the item is added to the DOM
+			beforeItemAdded: function(item){}, // callback before the item is added to the DOM
+			maximumSelectableOptions : false,			// Enable a maximum of options to be selected - expects integer
+			maximumSelectClass : 'asmMaximumSelect',	// CSS class applied to maximum message dialogue
 			removeLabel: 'remove',					// Text used in the "remove" link
 			highlightAddedLabel: 'Added: ',				// Text that precedes highlight of added item
 			highlightRemovedLabel: 'Removed: ',			// Text that precedes highlight of removed item
@@ -84,8 +86,34 @@
 				if(options.sortable) makeSortable();
 
 				if($.browser.msie && $.browser.version < 8) $ol.css('display', 'inline-block'); // Thanks Matthew Hutton
+				
+				checkMaximumSelectOptions();
 			}
 
+			function checkMaximumSelectOptions() {
+
+				if (!options.maximumSelectableOptions) return;
+
+				var currentCount = $select.find('.' + options.optionDisabledClass).length;
+
+				if (currentCount >= options.maximumSelectableOptions) {
+					// Disable the select drop down
+					$select.attr('disabled', 'disabled');
+					
+					var $maxOptionMessage = $("<span></span>")
+					.addClass(options.maximumSelectClass)
+					.attr('id', 'asm' + index + 'maxSelectOptions')
+					.html('Maximum options reached.');
+					
+					// Insert a user friendly message
+					$select.after($maxOptionMessage);
+
+				} else {
+					$('#asm' + index + 'maxSelectOptions').remove();
+					$select.attr('disabled', false);
+				}
+			}
+			
 			function makeSortable() {
 
 				// make any items in the selected list sortable
@@ -126,6 +154,7 @@
 				var id = $(this).children("option:selected").slice(0,1).attr('rel'); 
 				addListItem(id); 	
 				ieClick = false; 
+				checkMaximumSelectOptions();
 				triggerOriginalChange(id, 'add'); // for use by user-defined callbacks
 			}
 
@@ -232,7 +261,7 @@
 
 				$option.removeClass(options.optionDisabledClass)
 					.attr("disabled", false);
-
+				checkMaximumSelectOptions();
 				if(options.hideWhenAdded) $option.show();
 				if($.browser.msie) $select.hide().show(); // this forces IE to update display
 			}
